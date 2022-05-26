@@ -23,55 +23,58 @@ const pool = new Pool(config);
 
 pool.connect((error_conexion, client, release) => {
     console.log(error_conexion)
-    async function ingresar (){
-    const SQLQuery = {
-        name: 'insertarEstudiante',
-        text: 'insert into estudiantes (nombre, rut, curso, nivel) values ($1, $2, $3, $4) RETURNING *;', //agregarle comillas simples al INT
-        values: [nombre, rut, curso, nivel],
-    }
-    client.query(
-        SQLQuery,
-        (error_query, resul) => {
-            console.log(error_query);
-            release();
-            console.log("Registro agregado con éxito: ", resul.rows[0]);
-        });
+    async function ingresar() {
+        const SQLQuery = {
+            name: 'insertarEstudiante',
+            text: 'insert into estudiantes (nombre, rut, curso, nivel) values ($1, $2, $3, $4) RETURNING *;', //agregarle comillas simples al INT
+            values: [nombre, rut, curso, nivel],
+        }
+        client.query(
+            SQLQuery,
+            (error_query, resul) => {
+                console.log(error_query);
+                release();
+                console.log("Registro agregado con éxito: ", resul.rows[0]);
+            });
         pool.end();
     }
 });
 
 // Consultar los estudiantes registrados.
 pool.connect(async (error_conexion, client, release) => {
-     async function consulta() {
-    const SQLQuery = {
-        rowMode: "array",
-         name: 'sql-user', // prepared statement
-        text:
-            "SELECT * FROM estudiantes",
-    };
-    const res = await client.query(SQLQuery);
-    release();
-    console.log("Ultimo registro agregado: ", res.rows);
-    pool.end();
-}
+    async function consulta() {
+        const SQLQuery = {
+            rowMode: "array",
+            name: 'sql-user', // prepared statement
+            text:
+                "SELECT * FROM estudiantes",
+        };
+        try {
+        const res = await client.query(SQLQuery);
+        release();
+        console.log("Ultimo registro agregado: ", res.rows);
+    } catch (error) { console.log(error.code); }
+        pool.end();
+    }
 });
-
 
 //  Consultar estudiante por rut (node index.js funcion nombre 12.543.876-9)
 pool.connect(async (error_conexion, client, release) => {
-async function consultaRut() {
-    const SQLQuery = {
-        rowMode: "array",
-         name: 'sql-user', // prepared statement
-        text:
-            `SELECT * FROM estudiantes where rut = $1`,
-        values:[rut]
-    };
-    const res = await client.query(SQLQuery);
-    release();
-    console.log("Ultimo registro agregado: ", res.rows);
-    pool.end();
-}
+    async function consultaRut() {
+        const SQLQuery = {
+            rowMode: "array",
+            name: 'sql-user', // prepared statement
+            text:
+                `SELECT * FROM estudiantes where rut = $1`,
+            values: [rut]
+        };
+        try{
+        const res = await client.query(SQLQuery);
+        release();
+        console.log("Ultimo registro agregado: ", res.rows);
+        } catch (error) { console.log(error.code); }
+        pool.end();
+    }
 });
 
 //  Actualizar la información de un estudiante ej:nivel(node index.js funcion nombre 12.456.786-8 curso 6).
@@ -84,9 +87,11 @@ pool.connect(async (error_conexion, client, release) => {
                 `UPDATE estudiantes SET nivel = $2 WHERE rut = $1 RETURNING*; `,
             values: [rut, nivel]
         };
-        const res = await client.query(SQLQuery);
-        release();
-        console.log("Actualización realizada con éxito: ", res.rows);
+        try {
+            const res = await client.query(SQLQuery);
+            release();
+            console.log("Actualización realizada con éxito: ", res.rows);
+        } catch (error) { console.log(error.code); }
         pool.end();
     }
 });
@@ -113,3 +118,18 @@ pool.connect(async (error_conexion, client, release) => {
     }
 });
 
+if (funcion === 'ingresar') {
+    ingresar(nombre, rut, curso, nivel)
+}
+else if (funcion === 'consulta') {
+    consulta()
+}
+else if (funcion === 'consultaRut') {
+    consultaRut(nombre)// con (rut) no funciona por la posición de arv
+}
+else if (funcion === 'actualizar') {
+    actualizar(nivel)
+}
+else if (funcion === 'eliminar') {
+    eliminar(rut)
+}
