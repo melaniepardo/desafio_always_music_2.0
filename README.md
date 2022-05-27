@@ -1,7 +1,8 @@
 #  Desafío Always Music 2.0
 
 ## Descripción proyecto
-Proyecto que permite consultar, registrar, actualizar y eliminar estudiantes en una base de datos para la escuela de música Always Music. Para lo anterior se desarrolla una aplicación en Node que realice consultas simultaneas a PostgreSQL con el paquete “pg” y la clase Pool, y que también cuando se realicen consultas erróneas se reciba un error. 
+Proyecto que permite consultar, registrar, actualizar y eliminar estudiantes en una base de datos para la escuela de música Always Music.
+Para lo anterior, se desarrolla una aplicación en Node que realiza consultas simultaneas a PostgreSQL con el paquete “pg” y la clase Pool, y que también cuando se realizan consultas erróneas se reciba un error. 
 ## Contenidos aplicados 📖
 
 - Pooling.
